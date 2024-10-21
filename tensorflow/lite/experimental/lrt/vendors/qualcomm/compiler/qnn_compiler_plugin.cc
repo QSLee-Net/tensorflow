@@ -16,7 +16,6 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -184,7 +183,8 @@ LiteRtStatus LiteRtPluginCompile(LiteRtCompilerPlugin compiler_plugin,
   auto opt_soc_model = FindSocModel(soc_model);
 
   auto backend_configs = QnnManager::DefaultBackendConfigs();
-  auto qnn_manager = QnnManager::Create(backend_configs, opt_soc_model);
+  auto qnn_manager = QnnManager::Create(
+      backend_configs, /*shared_library_dir=*/std::nullopt, opt_soc_model);
   if (!qnn_manager.ok()) {
     LITERT_LOG(LITERT_ERROR, "%s", qnn_manager.status().message().data());
     return kLiteRtStatusErrorRuntimeFailure;
@@ -204,7 +204,7 @@ LiteRtStatus LiteRtPluginCompile(LiteRtCompilerPlugin compiler_plugin,
   {
     std::string& entry_point_name = result->graph_names.emplace_back();
     entry_point_name = "qnn_partition_0";
-    LITERT_RETURN_STATUS_IF_NOT_OK(ComposeGraph(
+    LITERT_RETURN_STATUS_IF_NOT_OK(litert::qnn::ComposeGraph(
         **qnn_manager, context_handle->get(), partitions[0], entry_point_name));
   }
 

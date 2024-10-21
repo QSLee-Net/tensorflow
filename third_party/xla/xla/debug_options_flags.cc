@@ -86,6 +86,7 @@ DebugOptions DefaultDebugOptionsIgnoringFlags() {
 #endif
   opts.set_xla_cpu_use_thunk_runtime(true);
   opts.set_xla_cpu_parallel_codegen_split_count(32);
+  opts.set_xla_cpu_copy_insertion_use_region_analysis(false);
   opts.set_xla_cpu_enable_concurrency_optimized_scheduler(false);
   opts.set_xla_cpu_prefer_vector_width(256);
   opts.set_xla_cpu_max_isa("");
@@ -881,6 +882,12 @@ void MakeDebugOptionsFlags(std::vector<tsl::Flag>* flag_list,
       "Split LLVM module into at most this many parts before codegen to enable "
       "parallel compilation for the CPU backend."));
   flag_list->push_back(tsl::Flag(
+      "xla_cpu_copy_insertion_use_region_analysis",
+      bool_setter_for(
+          &DebugOptions::set_xla_cpu_copy_insertion_use_region_analysis),
+      debug_options->xla_cpu_copy_insertion_use_region_analysis(),
+      "Use region based analysis in copy insertion pass."));
+  flag_list->push_back(tsl::Flag(
       "xla_cpu_enable_concurrency_optimized_scheduler",
       bool_setter_for(
           &DebugOptions::set_xla_cpu_enable_concurrency_optimized_scheduler),
@@ -999,6 +1006,13 @@ void MakeDebugOptionsFlags(std::vector<tsl::Flag>* flag_list,
                 debug_options->xla_dump_hlo_as_proto(),
                 "Dumps HLO modules as HloProtos to the directory specified by "
                 "--xla_dump_to."));
+  flag_list->push_back(
+      tsl::Flag("xla_gpu_experimental_dump_fdo_profiles",
+                bool_setter_for(
+                    &DebugOptions::set_xla_gpu_experimental_dump_fdo_profiles),
+                debug_options->xla_gpu_experimental_dump_fdo_profiles(),
+                "Dumps FDO profiles as text to the directory specified "
+                "by --xla_dump_to."));
   flag_list->push_back(
       tsl::Flag("xla_dump_hlo_as_dot",
                 bool_setter_for(&DebugOptions::set_xla_dump_hlo_as_dot),
